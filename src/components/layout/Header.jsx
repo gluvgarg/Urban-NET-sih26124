@@ -40,7 +40,7 @@ export const Header = ({ pageTitle }) => {
       <div className="flex items-center space-x-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            {pageTitle || "Urban Intelligence Command Center"}
+            {pageTitle || "URBAN NET — Intelligence Command Center"}
           </h1>
           <p className="text-xs text-slate-400">
             {cityConfig.authorityName} • Jurisdiction: <span className="text-blue-400 font-medium">{cityConfig.cityName}</span>

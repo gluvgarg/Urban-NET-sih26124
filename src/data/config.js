@@ -5,7 +5,7 @@ export const CITY_CONFIG = {
   cityName: "Delhi NCR",
   regionName: "National Capital Region, India",
   authorityName: "Delhi Urban Mobility & Transport Authority",
-  commandCenterName: "URBAN SENSE - Intelligence Command Center",
+  commandCenterName: "URBAN NET - Intelligence Command Center",
   center: [28.6139, 77.2090], // Latitude, Longitude (New Delhi center)
   zoom: 12,
   bounds: [

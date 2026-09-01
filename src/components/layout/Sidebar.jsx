@@ -34,14 +34,14 @@ export const Sidebar = () => {
       <div className="p-4 border-b border-slate-800/80 bg-slate-900/60">
         <div className="flex items-center space-x-3">
           <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-lg tracking-widest shadow-lg shadow-blue-500/20 ring-1 ring-blue-400/40">
-            US
+            UN
           </div>
           <div>
             <div className="text-base font-extrabold tracking-wider text-white flex items-center gap-1.5">
-              URBAN SENSE
+              URBAN NET
             </div>
-            <div className="text-[10px] uppercase tracking-wider text-blue-400 font-semibold">
-              Mobile Urban AI Platform
+            <div className="text-[9px] uppercase tracking-wider text-blue-400 font-bold leading-tight">
+              MOBILE URBAN INTELLIGENCE PLATFORM
             </div>
           </div>
         </div>

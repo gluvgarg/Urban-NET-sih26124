@@ -19,7 +19,7 @@ const PAGE_TITLES = {
 export const MainLayout = () => {
   const location = useLocation();
   const { toast } = useApp();
-  const pageTitle = PAGE_TITLES[location.pathname] || 'Urban Intelligence Platform';
+  const pageTitle = PAGE_TITLES[location.pathname] || 'URBAN NET — Mobile Urban Intelligence Platform';
 
   return (
     <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
