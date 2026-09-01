@@ -1,0 +1,115 @@
+// Road Defect Data & Maintenance Workflow State Machine
+// Supports: Detected -> Assigned -> In Progress -> Resolved
+
+export const MOCK_DEFECTS = [
+  {
+    id: "DEF_2026_0891",
+    type: "Pothole",
+    location: "MG Road, Sector 14",
+    latitude: 28.6139,
+    longitude: 77.2090,
+    busId: "BUS_17",
+    confidence: 0.964,
+    severity: "HIGH",
+    detectedAt: "2026-08-31 10:31:24",
+    status: "Detected",
+    assignedTo: "Unassigned",
+    estimatedCost: "₹14,500",
+    workOrder: "WO-PENDING",
+    evidenceImage: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600&auto=format&fit=crop&q=80",
+    description: "Severe pothole (45cm x 60cm, depth 12cm) in primary bus corridor."
+  },
+  {
+    id: "DEF_2026_0890",
+    type: "Waterlogging",
+    location: "Sector 14 Underpass",
+    latitude: 28.6250,
+    longitude: 77.2180,
+    busId: "BUS_12",
+    confidence: 0.981,
+    severity: "HIGH",
+    detectedAt: "2026-08-31 10:23:45",
+    status: "Assigned",
+    assignedTo: "Drainage Rapid Response Team 3",
+    estimatedCost: "₹22,000",
+    workOrder: "WO-2026-4401",
+    evidenceImage: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=600&auto=format&fit=crop&q=80",
+    description: "Stormwater pump failure causing 25cm deep puddle across two traffic lanes."
+  },
+  {
+    id: "DEF_2026_0889",
+    type: "Damaged Road",
+    location: "Mahipalpur Bypass",
+    latitude: 28.5410,
+    longitude: 77.1290,
+    busId: "BUS_23",
+    confidence: 0.908,
+    severity: "MEDIUM",
+    detectedAt: "2026-08-31 09:15:40",
+    status: "In Progress",
+    assignedTo: "South District Paving Crew B",
+    estimatedCost: "₹85,000",
+    workOrder: "WO-2026-4392",
+    evidenceImage: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600&auto=format&fit=crop&q=80",
+    description: "Surface crumbling and bitumen stripping over 15m stretch."
+  },
+  {
+    id: "DEF_2026_0888",
+    type: "Pothole",
+    location: "Ring Road near Lajpat Nagar",
+    latitude: 28.5680,
+    longitude: 77.2410,
+    busId: "BUS_05",
+    confidence: 0.932,
+    severity: "CRITICAL",
+    detectedAt: "2026-08-31 08:45:10",
+    status: "Assigned",
+    assignedTo: "Central Division Maintenance",
+    estimatedCost: "₹18,000",
+    workOrder: "WO-2026-4389",
+    evidenceImage: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600&auto=format&fit=crop&q=80",
+    description: "Deep edge crater near bus stop bay causing severe vehicular sway."
+  },
+  {
+    id: "DEF_2026_0887",
+    type: "Waterlogging",
+    location: "Dhaula Kuan Junction East",
+    latitude: 28.5915,
+    longitude: 77.1625,
+    busId: "BUS_31",
+    confidence: 0.954,
+    severity: "MEDIUM",
+    detectedAt: "2026-08-31 07:55:00",
+    status: "Resolved",
+    assignedTo: "PWD Municipal Drain Crew",
+    estimatedCost: "₹9,500",
+    workOrder: "WO-2026-4375",
+    evidenceImage: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=600&auto=format&fit=crop&q=80",
+    description: "Clogged stormwater inlet cleared by municipal team. Road now dry."
+  },
+  {
+    id: "DEF_2026_0886",
+    type: "Damaged Road",
+    location: "Barakhamba Road",
+    latitude: 28.6295,
+    longitude: 77.2250,
+    busId: "BUS_01",
+    confidence: 0.887,
+    severity: "LOW",
+    detectedAt: "2026-08-31 07:20:18",
+    status: "Resolved",
+    assignedTo: "Central Ward Patchwork Unit",
+    estimatedCost: "₹6,000",
+    workOrder: "WO-2026-4360",
+    evidenceImage: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600&auto=format&fit=crop&q=80",
+    description: "Minor trench settlement filled with cold-mix asphalt patch."
+  }
+];
+
+export const ROAD_DEFECT_STATS = {
+  totalIssues: 167,
+  potholes: 82,
+  waterlogging: 31,
+  infrastructureIssues: 54,
+  resolvedToday: 63
+};
