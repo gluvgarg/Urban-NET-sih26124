@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Road Status Map</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-pothole: #f59e0b; /* Amber */
+            --accent-acc: #ef4444; /* Red */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Glassmorphism Header */
+        header {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 16px 32px;
+            border-radius: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            transition: all 0.3s ease;
+        }
+        
+        header:hover {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot.pothole { background-color: var(--accent-pothole); box-shadow: 0 0 12px var(--accent-pothole); }
+        .dot.acc { background-color: var(--accent-acc); box-shadow: 0 0 12px var(--accent-acc); }
+
+        /* Map Container */
+        #map {
+            flex-grow: 1;
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+        }
+
+        /* Leaflet Dark Mode Tweaks */
+        .leaflet-layer,
+        .leaflet-control-zoom-in,
+        .leaflet-control-zoom-out,
+        .leaflet-control-attribution {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
+
+        /* Custom Popup Styling */
+        .leaflet-popup-content-wrapper {
+            background: rgba(15, 23, 42, 0.9) !important;
+            backdrop-filter: blur(10px);
+            color: var(--text-primary) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            padding: 4px;
+        }
+        .leaflet-popup-tip {
+            background: rgba(15, 23, 42, 0.9) !important;
+        }
+        .popup-content h3 {
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .popup-content p {
+            margin: 6px 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .popup-content span {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Road Status</h1>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="dot pothole"></div>
+                Potholes
+            </div>
+            <div class="legend-item">
+                <div class="dot acc"></div>
+                Accidents
+            </div>
+        </div>
+    </header>
+
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <script>
+        // Initialize Map (Default to India coordinates)
+        const map = L.map('map', {
+            zoomControl: false // Move zoom control to bottom right
+        }).setView([20.5937, 78.9629], 5);
+
+        L.control.zoom({
+            position: 'bottomright'
+        }).addTo(map);
+
+        // Add OpenStreetMap tiles (Inverted in CSS for beautiful dark mode)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Keep track of layers to refresh smoothly without flickering
+        let potholeLayerGroup = L.layerGroup().addTo(map);
+        let accLayerGroup = L.layerGroup().addTo(map);
+        let bounds = [];
+
+        // Fetch and Plot Data
+        async function fetchAndPlotData() {
+            try {
+                // Clear existing layers for fresh plot
+                potholeLayerGroup.clearLayers();
+                accLayerGroup.clearLayers();
+                bounds = [];
+
+                // 1. Fetch Potholes
+                const potholeRes = await fetch('/defect');
+                const potholeData = await potholeRes.json();
+                
+                if(potholeData.success && potholeData.data) {
+                    potholeData.data.forEach(p => {
+                        if(p.latitude && p.longitude) {
+                            const marker = L.circleMarker([p.latitude, p.longitude], {
+                                color: '#f59e0b',
+                                fillColor: '#f59e0b',
+                                fillOpacity: 0.8,
+                                radius: 7,
+                                weight: 2
+                            });
+
+                            bounds.push([p.latitude, p.longitude]);
+
+                            const timeString = new Date(p.time).toLocaleString();
+                            marker.bindPopup(`
+                                <div class="popup-content">
+                                    <h3 style="color: #f59e0b;">Pothole Detected</h3>
+                                    <p>Type <span>${p.defect_type || 'N/A'}</span></p>
+                                    <p>Confidence <span>${(p.confidence * 100).toFixed(1)}%</span></p>
+                                    <p>Bus ID <span>${p.bus_id}</span></p>
+                                    <p>Time <span>${timeString}</span></p>
+                                </div>
+                            `);
+                            
+                            potholeLayerGroup.addLayer(marker);
+                        }
+                    });
+                }
+
+                // 2. Fetch Accidents
+                const accRes = await fetch('/acc');
+                const accData = await accRes.json();
+                
+                if(accData.success && accData.data) {
+                    accData.data.forEach(a => {
+                        if(a.latitude && a.longitude) {
+                            const marker = L.circleMarker([a.latitude, a.longitude], {
+                                color: '#ef4444',
+                                fillColor: '#ef4444',
+                                fillOpacity: 0.8,
+                                radius: 9,
+                                weight: 2
+                            });
+
+                            bounds.push([a.latitude, a.longitude]);
+
+                            const timeString = new Date(a.time).toLocaleString();
+                            marker.bindPopup(`
+                                <div class="popup-content">
+                                    <h3 style="color: #ef4444;">Accident Reported</h3>
+                                    <p>Type <span>${a.acc_type || 'N/A'}</span></p>
+                                    <p>Confidence <span>${(a.confidence * 100).toFixed(1)}%</span></p>
+                                    <p>Bus ID <span>${a.bus_id}</span></p>
+                                    <p>Time <span>${timeString}</span></p>
+                                </div>
+                            `);
+
+                            accLayerGroup.addLayer(marker);
+                        }
+                    });
+                }
+
+                // Only fit bounds on first load if we have data
+                if (bounds.length > 0 && !window.hasFittedBounds) {
+                    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+                    window.hasFittedBounds = true;
+                }
+
+            } catch (err) {
+                console.error("Error fetching map data:", err);
+            }
+        }
+
+        // Initial fetch
+        fetchAndPlotData();
+        
+        // Refresh data every 10 seconds to make it feel real-time
+        setInterval(fetchAndPlotData, 10000);
+    </script>
+</body>
+</html>

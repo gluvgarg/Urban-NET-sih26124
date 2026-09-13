@@ -22,3 +22,27 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+frontend/dist/
+
+# SQLite
+backend/db/*.sqlite
+backend/db/*.sqlite-shm
+backend/db/*.sqlite-wal
+
+# Uploaded/generated files
+backend/public/uploads/*
+!backend/public/uploads/.gitkeep
+
+# Logs
+*.log
