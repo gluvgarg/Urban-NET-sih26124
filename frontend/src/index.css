@@ -74,7 +74,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 10px rgba(220, 38, 38, 0.6);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Pipeline Step Glow */

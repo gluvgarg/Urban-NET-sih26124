@@ -22,27 +22,27 @@ export const MainLayout = () => {
   const pageTitle = PAGE_TITLES[location.pathname] || 'URBAN NET — Mobile Urban Intelligence Platform';
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden font-sans text-xs">
+    <div className="flex h-screen bg-slate-100 text-slate-800 overflow-hidden font-sans text-xs">
       {/* Persistent Left Sidebar */}
       <Sidebar />
 
       {/* Main Operations Console */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-900">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-100">
         {/* Top Command Header */}
         <Header pageTitle={pageTitle} />
 
         {/* Dynamic Page Content View */}
-        <main className="flex-1 overflow-y-auto p-5 bg-slate-950/60 space-y-4">
+        <main className="flex-1 overflow-y-auto p-4 bg-slate-100 space-y-4">
           <Outlet />
         </main>
 
         {/* Global Toast Notification Popup */}
         {toast && (
-          <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 px-3.5 py-2.5 bg-slate-900 border border-slate-700 text-slate-100 text-xs rounded shadow-lg animate-in fade-in slide-in-from-bottom-2">
-            {toast.type === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
-            {toast.type === 'warning' && <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />}
-            {toast.type === 'info' && <Info className="w-4 h-4 text-blue-400 shrink-0" />}
-            <span className="font-medium">{toast.message}</span>
+          <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 px-3.5 py-2.5 bg-white border border-slate-300 text-slate-900 text-xs rounded-md shadow-md">
+            {toast.type === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
+            {toast.type === 'warning' && <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />}
+            {toast.type === 'info' && <Info className="w-4 h-4 text-blue-600 shrink-0" />}
+            <span className="font-semibold">{toast.message}</span>
           </div>
         )}
       </div>

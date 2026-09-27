@@ -43,10 +43,10 @@ export const Header = ({ pageTitle }) => {
             {cityConfig.authorityName} • Jurisdiction: <span className="text-blue-400 font-medium">{cityConfig.cityName}</span>
           </p>
         </div>
-        <div className="hidden md:flex items-center px-2 py-0.5 bg-emerald-950/90 border border-emerald-800 rounded text-emerald-400 text-[10px] font-mono font-semibold gap-1.5">
+        {/* <div className="hidden md:flex items-center px-2 py-0.5 bg-emerald-950/90 border border-emerald-800 rounded text-emerald-400 text-[10px] font-mono font-semibold gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
           <span>SYSTEM ONLINE</span>
-        </div>
+        </div> */}
       </div>
 
       {/* Controls & Clock & User */}
@@ -136,7 +136,7 @@ export const Header = ({ pageTitle }) => {
         </div>
 
         {/* User Profile */}
-        <div className="flex items-center pl-2 border-l border-slate-800 space-x-2">
+        {/* <div className="flex items-center pl-2 border-l border-slate-800 space-x-2">
           <div className="w-7 h-7 rounded bg-blue-700 border border-blue-500 flex items-center justify-center font-bold text-white text-[11px]">
             BEL
           </div>
@@ -144,7 +144,7 @@ export const Header = ({ pageTitle }) => {
             <div className="font-semibold text-slate-200 text-[11px]">Municipal Operator</div>
             <div className="text-[9px] text-slate-400 font-mono">ID: OP-4409</div>
           </div>
-        </div>
+        </div> */}
       </div>
     </header>
   );

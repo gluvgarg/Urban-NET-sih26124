@@ -231,7 +231,7 @@ async function processEdgeEvent(payload) {
   } else if (featUpper === 'WATERLOGGING') {
     type = 'Waterlogging';
     category = 'ROAD_DEFECT';
-    defaultImg = 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=600&auto=format&fit=crop&q=80';
+    defaultImg = 'http://localhost:5000/uploads/waterlogging_image.jpeg';
   } else if (featUpper === 'FOOTPATH_DAMAGE' || featUpper === 'INFRASTRUCTURE') {
     type = payload.metadata?.type || 'Damaged Footpath';
     category = 'INFRASTRUCTURE';

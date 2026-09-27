@@ -40,72 +40,72 @@ export const TrafficIntelligence = () => {
   const hourlyData = hourlyTrafficTrend && hourlyTrafficTrend.length > 0 ? hourlyTrafficTrend : HOURLY_TRAFFIC_TREND;
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-4 pb-10 text-xs text-slate-800">
       {/* 1. TOP TRAFFIC SUMMARY CARDS */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-[11px] font-bold uppercase">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="bg-white border border-slate-200 rounded-md p-3.5 space-y-1 shadow-sm">
+          <div className="flex items-center justify-between text-slate-500 text-[10px] font-bold uppercase tracking-wider">
             <span>VEHICLES DETECTED</span>
-            <Car className="w-4 h-4 text-blue-400" />
+            <Car className="w-4 h-4 text-blue-600" />
           </div>
-          <div className="text-2xl font-black text-white">
+          <div className="text-xl font-bold text-slate-900 font-mono">
             {typeof summary.vehiclesDetectedToday === 'number' 
               ? summary.vehiclesDetectedToday.toLocaleString() 
               : (summary.vehiclesDetectedToday || '18,420')}
           </div>
-          <div className="text-[10px] text-emerald-400 font-semibold">+8.4% Fleet Edge Count</div>
+          <div className="text-[10px] text-emerald-700 font-semibold">+8.4% Fleet Edge Count</div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-[11px] font-bold uppercase">
+        <div className="bg-white border border-slate-200 rounded-md p-3.5 space-y-1 shadow-sm">
+          <div className="flex items-center justify-between text-slate-500 text-[10px] font-bold uppercase tracking-wider">
             <span>CURRENT TRAFFIC INDEX</span>
-            <TrendingUp className="w-4 h-4 text-amber-400" />
+            <TrendingUp className="w-4 h-4 text-amber-600" />
           </div>
-          <div className="text-2xl font-black text-amber-400">
-            {summary.trafficIndex} <span className="text-sm text-slate-500 font-normal">/ 100</span>
+          <div className="text-xl font-bold text-amber-800 font-mono">
+            {summary.trafficIndex} <span className="text-xs text-slate-400 font-normal">/ 100</span>
           </div>
-          <div className="text-[10px] text-amber-400 font-semibold">High Morning Peak</div>
+          <div className="text-[10px] text-amber-800 font-medium">Peak Corridor Density</div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-[11px] font-bold uppercase">
+        <div className="bg-white border border-slate-200 rounded-md p-3.5 space-y-1 shadow-sm">
+          <div className="flex items-center justify-between text-slate-500 text-[10px] font-bold uppercase tracking-wider">
             <span>CONGESTED ZONES</span>
-            <AlertCircle className="w-4 h-4 text-rose-500" />
+            <AlertCircle className="w-4 h-4 text-red-600" />
           </div>
-          <div className="text-2xl font-black text-rose-400">{summary.congestedZonesCount}</div>
-          <div className="text-[10px] text-slate-400">Queue Lengths &gt; 300m</div>
+          <div className="text-xl font-bold text-red-600 font-mono">{summary.congestedZonesCount}</div>
+          <div className="text-[10px] text-slate-500">Queue Lengths &gt; 300m</div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-[11px] font-bold uppercase">
+        <div className="bg-white border border-slate-200 rounded-md p-3.5 space-y-1 shadow-sm">
+          <div className="flex items-center justify-between text-slate-500 text-[10px] font-bold uppercase tracking-wider">
             <span>AVERAGE FLEET SPEED</span>
-            <Gauge className="w-4 h-4 text-emerald-400" />
+            <Gauge className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-2xl font-black text-emerald-400">{summary.avgFleetSpeed}</div>
-          <div className="text-[10px] text-emerald-400 font-semibold">Optimal Flow on Expressways</div>
+          <div className="text-xl font-bold text-emerald-700 font-mono">{summary.avgFleetSpeed}</div>
+          <div className="text-[10px] text-emerald-700 font-medium">Optimal Flow on Expressways</div>
         </div>
       </div>
 
       {/* 2. CHARTS SPLIT: VEHICLE CLASSIFICATION & HOURLY DENSITY */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* LEFT ~40%: VEHICLE CLASSIFICATION DONUT & BREAKDOWN */}
-        <div className="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-            <span className="text-xs font-bold text-white uppercase tracking-wider">
+        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-md p-4 shadow-sm space-y-3">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+            <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
               Edge AI Vehicle Classification
             </span>
-            <span className="text-[10px] text-slate-400">5 Categories Detected</span>
+            <span className="text-[10px] text-slate-500 font-mono">5 Categories</span>
           </div>
 
-          <div className="h-56 w-full flex items-center justify-center">
+          <div className="h-52 w-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={VEHICLE_CLASSIFICATION}
                   cx="50%"
                   cy="50%"
-                  innerRadius={55}
-                  outerRadius={80}
+                  innerRadius={50}
+                  outerRadius={75}
                   paddingAngle={4}
                   dataKey="count"
                 >
@@ -113,43 +113,45 @@ export const TrafficIntelligence = () => {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '6px', fontSize: '12px' }} />
+                <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: '4px', fontSize: '11px', color: '#0f172a' }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
 
           {/* Classification Legend Grid */}
-          <div className="grid grid-cols-2 gap-2 text-xs border-t border-slate-800 pt-3">
+          <div className="grid grid-cols-2 gap-2 text-xs border-t border-slate-200 pt-3">
             {VEHICLE_CLASSIFICATION.map(item => (
-              <div key={item.name} className="flex items-center justify-between bg-slate-950 p-2 rounded border border-slate-800">
-                <span className="flex items-center gap-1.5 text-slate-300">
+              <div key={item.name} className="flex items-center justify-between bg-slate-50 p-2 rounded border border-slate-200">
+                <span className="flex items-center gap-1.5 text-slate-700">
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }}></span>
                   {item.name}
                 </span>
-                <span className="font-bold text-white font-mono">{item.percentage}%</span>
+                <span className="font-bold text-slate-900 font-mono">{item.percentage}%</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* RIGHT ~60%: HOURLY TRAFFIC DENSITY TREND */}
-        <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-            <span className="text-xs font-bold text-white uppercase tracking-wider">
+        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-md p-4 shadow-sm space-y-3">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+            <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
               24-Hour Traffic Volume & Speed Telemetry
             </span>
-            <span className="text-[10px] text-blue-400 font-mono">LIVE AGGREGATION</span>
+            <span className="text-[10px] text-blue-700 font-mono font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+              LIVE AGGREGATION
+            </span>
           </div>
 
-          <div className="h-72 w-full">
+          <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={hourlyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                <XAxis dataKey="time" stroke="#94a3b8" fontSize={10} />
-                <YAxis stroke="#94a3b8" fontSize={10} />
-                <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '6px', fontSize: '12px' }} />
-                <Line type="monotone" dataKey="volume" stroke="#3b82f6" strokeWidth={2.5} name="Vehicle Count" />
-                <Line type="monotone" dataKey="speed" stroke="#10b981" strokeWidth={2} name="Avg Speed (km/h)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="time" stroke="#64748b" fontSize={10} />
+                <YAxis stroke="#64748b" fontSize={10} />
+                <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: '4px', fontSize: '11px', color: '#0f172a' }} />
+                <Line type="monotone" dataKey="volume" stroke="#2563eb" strokeWidth={2} name="Vehicle Count" />
+                <Line type="monotone" dataKey="speed" stroke="#059669" strokeWidth={1.5} name="Avg Speed (km/h)" />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -157,20 +159,20 @@ export const TrafficIntelligence = () => {
       </div>
 
       {/* 3. CONGESTED ZONES & ROUTE PERFORMANCE TABLES */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Congested Zones Table */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="bg-white border border-slate-200 rounded-md p-4 shadow-sm space-y-3">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-2">
             <div className="flex items-center space-x-2">
-              <MapPin className="w-4 h-4 text-rose-400" />
-              <span className="text-sm font-bold text-white">CONGESTED TRAFFIC CORRIDORS</span>
+              <MapPin className="w-4 h-4 text-red-600" />
+              <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">CONGESTED TRAFFIC CORRIDORS</span>
             </div>
-            <span className="text-xs text-slate-400">Current bottlenecks</span>
+            <span className="text-[10px] text-slate-500 font-mono">Current Bottlenecks</span>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] border-b border-slate-800">
+            <table className="w-full text-left text-xs text-slate-800">
+              <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] border-b border-slate-200 font-mono">
                 <tr>
                   <th className="p-2.5">Corridor Zone</th>
                   <th className="p-2.5">Traffic Index</th>
@@ -179,22 +181,22 @@ export const TrafficIntelligence = () => {
                   <th className="p-2.5 text-right">Trend</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-slate-100">
                 {zonesList.map((zone, idx) => (
-                  <tr key={idx} className="hover:bg-slate-800/40 transition">
-                    <td className="p-2.5 font-bold text-slate-100">{zone.zone}</td>
+                  <tr key={idx} className="hover:bg-slate-50 transition">
+                    <td className="p-2.5 font-bold text-slate-900">{zone.zone}</td>
                     <td className="p-2.5 font-mono">
-                      <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${
-                        zone.trafficIndex > 80 ? 'bg-red-950 text-red-400 border border-red-800' :
-                        zone.trafficIndex > 60 ? 'bg-amber-950 text-amber-400 border border-amber-800' :
-                        'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                      <span className={`px-2 py-0.5 rounded font-bold text-[10px] border ${
+                        zone.trafficIndex > 80 ? 'bg-red-50 text-red-700 border-red-200' :
+                        zone.trafficIndex > 60 ? 'bg-amber-50 text-amber-800 border-amber-200' :
+                        'bg-emerald-50 text-emerald-700 border-emerald-200'
                       }`}>
                         {zone.trafficIndex}
                       </span>
                     </td>
-                    <td className="p-2.5 text-slate-300 font-mono">{zone.avgSpeed}</td>
-                    <td className="p-2.5 text-blue-400 font-mono font-semibold">{zone.vehicleCount}</td>
-                    <td className="p-2.5 text-right font-mono text-rose-400 font-bold">{zone.trend}</td>
+                    <td className="p-2.5 text-slate-700 font-mono">{zone.avgSpeed}</td>
+                    <td className="p-2.5 text-blue-700 font-mono font-semibold">{zone.vehicleCount}</td>
+                    <td className="p-2.5 text-right font-mono text-red-600 font-bold">{zone.trend}</td>
                   </tr>
                 ))}
               </tbody>
@@ -203,18 +205,18 @@ export const TrafficIntelligence = () => {
         </div>
 
         {/* Route Delay Estimation Table */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="bg-white border border-slate-200 rounded-md p-4 shadow-sm space-y-3">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-2">
             <div className="flex items-center space-x-2">
-              <Clock className="w-4 h-4 text-cyan-400" />
-              <span className="text-sm font-bold text-white">PUBLIC ROUTE DELAY ESTIMATION</span>
+              <Clock className="w-4 h-4 text-blue-600" />
+              <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">PUBLIC ROUTE DELAY ESTIMATION</span>
             </div>
-            <span className="text-xs text-slate-400">Transit Fleet Delay Telemetry</span>
+            <span className="text-[10px] text-slate-500 font-mono">Transit Fleet Telemetry</span>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] border-b border-slate-800">
+            <table className="w-full text-left text-xs text-slate-800">
+              <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] border-b border-slate-200 font-mono">
                 <tr>
                   <th className="p-2.5">Route</th>
                   <th className="p-2.5">Normal Time</th>
@@ -223,17 +225,17 @@ export const TrafficIntelligence = () => {
                   <th className="p-2.5 text-right">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-slate-100">
                 {ROUTE_PERFORMANCE.map((route, idx) => (
-                  <tr key={idx} className="hover:bg-slate-800/40 transition">
-                    <td className="p-2.5 font-bold text-slate-100">{route.route}</td>
-                    <td className="p-2.5 text-slate-400 font-mono">{route.normalTime}</td>
-                    <td className="p-2.5 text-slate-200 font-mono font-semibold">{route.currentTime}</td>
-                    <td className="p-2.5 font-mono font-bold text-rose-400">{route.delay}</td>
+                  <tr key={idx} className="hover:bg-slate-50 transition">
+                    <td className="p-2.5 font-bold text-slate-900">{route.route}</td>
+                    <td className="p-2.5 text-slate-500 font-mono">{route.normalTime}</td>
+                    <td className="p-2.5 text-slate-800 font-mono font-semibold">{route.currentTime}</td>
+                    <td className="p-2.5 font-mono font-bold text-red-600">{route.delay}</td>
                     <td className="p-2.5 text-right">
-                      <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${
-                        route.status === 'Delayed' ? 'bg-rose-950 text-rose-400 border border-rose-800' :
-                        'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                      <span className={`px-2 py-0.5 rounded font-bold text-[10px] border ${
+                        route.status === 'Delayed' ? 'bg-red-50 text-red-700 border-red-200' :
+                        'bg-emerald-50 text-emerald-700 border-emerald-200'
                       }`}>
                         {route.status}
                       </span>

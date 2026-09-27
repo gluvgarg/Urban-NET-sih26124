@@ -10,7 +10,8 @@ import {
   Siren, 
   MapPin, 
   X, 
-  Zap
+  Zap,
+  Radio
 } from 'lucide-react';
 import { SEVERITY_BADGES } from '../data/events';
 
@@ -18,7 +19,7 @@ const createCustomIcon = (color, symbol) => {
   return L.divIcon({
     className: 'custom-map-icon',
     html: `
-      <div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.4);">
+      <div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
         ${symbol}
       </div>
     `,
@@ -54,39 +55,41 @@ export const GisMap = () => {
   });
 
   return (
-    <div className="h-[calc(100vh-95px)] flex flex-col lg:flex-row space-y-3 lg:space-y-0 lg:space-x-3 relative text-xs">
+    <div className="h-[calc(100vh-95px)] flex flex-col lg:flex-row space-y-3 lg:space-y-0 lg:space-x-3 relative text-xs text-slate-800">
       {/* LEFT CONTROL PANEL */}
-      <div className="w-full lg:w-72 bg-slate-900 border border-slate-800 rounded p-3 flex flex-col space-y-3 shrink-0 overflow-y-auto">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+      <div className="w-full lg:w-72 bg-white border border-slate-200 rounded-md p-3 flex flex-col space-y-3 shrink-0 overflow-y-auto shadow-sm">
+        <div className="flex items-center justify-between border-b border-slate-200 pb-2">
           <div className="flex items-center space-x-1.5">
-            <Filter className="w-3.5 h-3.5 text-blue-400" />
-            <span className="text-xs font-bold text-white uppercase tracking-wider">GIS Map Controls</span>
+            <Filter className="w-3.5 h-3.5 text-blue-600" />
+            <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">GIS Map Controls</span>
           </div>
-          <span className="text-[10px] text-slate-400 font-mono">LIVE SPATIAL</span>
+          <span className="text-[10px] text-blue-700 font-mono font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+            SPATIAL ENGINE
+          </span>
         </div>
 
         {/* LAYER TOGGLES */}
         <div className="space-y-1.5">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">Map Layers</div>
+          <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Map Layers</div>
           <div className="grid grid-cols-2 gap-1.5 text-xs">
             <button
               onClick={() => setActiveLayers(p => ({ ...p, buses: !p.buses }))}
               className={`p-1.5 rounded border text-left flex items-center justify-between transition ${
                 activeLayers.buses 
-                  ? 'bg-slate-800 border-blue-500 text-blue-300 font-semibold' 
-                  : 'bg-slate-950 border-slate-800 text-slate-500'
+                  ? 'bg-blue-50 border-blue-500 text-blue-700 font-semibold' 
+                  : 'bg-slate-50 border-slate-200 text-slate-500'
               }`}
             >
               <span className="flex items-center gap-1.5"><Bus className="w-3.5 h-3.5" /> Buses</span>
-              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+              <span className="w-2 h-2 rounded-full bg-blue-600"></span>
             </button>
 
             <button
               onClick={() => setActiveLayers(p => ({ ...p, defects: !p.defects }))}
-              className={`p-2 rounded border text-left flex items-center justify-between transition ${
+              className={`p-1.5 rounded border text-left flex items-center justify-between transition ${
                 activeLayers.defects 
-                  ? 'bg-slate-800 border-amber-500 text-amber-300 font-semibold' 
-                  : 'bg-slate-950 border-slate-800 text-slate-500'
+                  ? 'bg-amber-50 border-amber-500 text-amber-800 font-semibold' 
+                  : 'bg-slate-50 border-slate-200 text-slate-500'
               }`}
             >
               <span className="flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5" /> Defects</span>
@@ -97,35 +100,35 @@ export const GisMap = () => {
               onClick={() => setActiveLayers(p => ({ ...p, infrastructure: !p.infrastructure }))}
               className={`p-1.5 rounded border text-left flex items-center justify-between transition ${
                 activeLayers.infrastructure 
-                  ? 'bg-slate-800 border-purple-500 text-purple-300 font-semibold' 
-                  : 'bg-slate-950 border-slate-800 text-slate-500'
+                  ? 'bg-purple-50 border-purple-500 text-purple-800 font-semibold' 
+                  : 'bg-slate-50 border-slate-200 text-slate-500'
               }`}
             >
               <span className="flex items-center gap-1.5"><ShieldAlert className="w-3.5 h-3.5" /> Infra</span>
-              <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+              <span className="w-2 h-2 rounded-full bg-purple-600"></span>
             </button>
 
             <button
               onClick={() => setActiveLayers(p => ({ ...p, incidents: !p.incidents }))}
               className={`p-1.5 rounded border text-left flex items-center justify-between transition ${
                 activeLayers.incidents 
-                  ? 'bg-slate-800 border-rose-500 text-rose-300 font-semibold' 
-                  : 'bg-slate-950 border-slate-800 text-slate-500'
+                  ? 'bg-red-50 border-red-500 text-red-700 font-semibold' 
+                  : 'bg-slate-50 border-slate-200 text-slate-500'
               }`}
             >
               <span className="flex items-center gap-1.5"><Siren className="w-3.5 h-3.5" /> Safety</span>
-              <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+              <span className="w-2 h-2 rounded-full bg-red-600"></span>
             </button>
           </div>
         </div>
 
         {/* EVENT TYPE FILTER */}
         <div className="space-y-1">
-          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">Event Type Filter</label>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Event Type Filter</label>
           <select
             value={mapFilters.eventType}
             onChange={(e) => setMapFilters(p => ({ ...p, eventType: e.target.value }))}
-            className="w-full bg-slate-950 border border-slate-800 rounded p-1.5 text-xs text-slate-200 focus:outline-none focus:border-slate-600"
+            className="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Event Types</option>
             <option value="POTHOLE">Pothole</option>
@@ -142,11 +145,11 @@ export const GisMap = () => {
 
         {/* SEVERITY FILTER */}
         <div className="space-y-1">
-          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">Severity Level</label>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Severity Level</label>
           <select
             value={mapFilters.severity}
             onChange={(e) => setMapFilters(p => ({ ...p, severity: e.target.value }))}
-            className="w-full bg-slate-950 border border-slate-800 rounded p-1.5 text-xs text-slate-200 focus:outline-none focus:border-slate-600"
+            className="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Severities</option>
             <option value="CRITICAL">Critical</option>
@@ -158,11 +161,11 @@ export const GisMap = () => {
 
         {/* BUS FILTER */}
         <div className="space-y-1">
-          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">Sensing Bus Unit</label>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Sensing Bus Unit</label>
           <select
             value={mapFilters.busId}
             onChange={(e) => setMapFilters(p => ({ ...p, busId: e.target.value }))}
-            className="w-full bg-slate-950 border border-slate-800 rounded p-1.5 text-xs text-slate-200 focus:outline-none focus:border-slate-600"
+            className="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Buses ({buses.length})</option>
             <option value="BUS_01">BUS_01 (Route 101)</option>
@@ -176,20 +179,20 @@ export const GisMap = () => {
         </div>
 
         {/* SUMMARY STATS */}
-        <div className="pt-2 border-t border-slate-800 space-y-1 text-xs text-slate-400">
+        <div className="pt-2 border-t border-slate-200 space-y-1 text-xs text-slate-600 font-medium">
           <div className="flex justify-between">
             <span>Events Visible:</span>
-            <span className="font-bold text-white font-mono">{filteredEvents.length}</span>
+            <span className="font-bold text-slate-900 font-mono">{filteredEvents.length}</span>
           </div>
           <div className="flex justify-between">
             <span>Bus Sensors:</span>
-            <span className="font-bold text-blue-400 font-mono">{buses.filter(b => b.status === 'ONLINE').length} Online</span>
+            <span className="font-bold text-blue-700 font-mono">{buses.filter(b => b.status === 'ONLINE').length} Online</span>
           </div>
         </div>
       </div>
 
       {/* RIGHT MAIN MAP VIEW */}
-      <div className="flex-1 bg-slate-900 border border-slate-800 rounded overflow-hidden relative">
+      <div className="flex-1 bg-white border border-slate-200 rounded-md overflow-hidden relative shadow-sm">
         <MapContainer
           center={cityConfig.center}
           zoom={cityConfig.zoom}
@@ -205,15 +208,18 @@ export const GisMap = () => {
             <Marker
               key={bus.id}
               position={[bus.latitude, bus.longitude]}
-              icon={createCustomIcon(bus.status === 'ONLINE' ? '#2563eb' : '#d97706', '🚌')}
+              icon={createCustomIcon(bus.status === 'ONLINE' ? '#2563eb' : '#d97706', 'B')}
             >
               <Popup>
                 <div className="text-xs p-1 space-y-1">
-                  <div className="font-bold text-blue-600">{bus.id} • {bus.vehicleReg}</div>
+                  <div className="font-bold text-blue-700">{bus.id} • {bus.vehicleReg}</div>
                   <div>Route: {bus.routeName}</div>
                   <div>Status: <span className="font-semibold text-emerald-600">{bus.status}</span></div>
                   <div>Edge AI: {bus.edgeAiHealth}</div>
                   <div>Speed: {bus.speed} km/h</div>
+                  <div className="pt-1 border-t border-slate-200 text-[10px] font-mono text-blue-600 font-semibold">
+                    SOURCE: EDGE AI SENSING UNIT
+                  </div>
                 </div>
               </Popup>
             </Marker>
@@ -221,6 +227,10 @@ export const GisMap = () => {
 
           {/* DETECTED EVENTS MARKERS */}
           {filteredEvents.map(evt => {
+            const lat = parseFloat(evt.latitude ?? evt.location?.latitude);
+            const lng = parseFloat(evt.longitude ?? evt.location?.longitude);
+            if (isNaN(lat) || isNaN(lng)) return null;
+
             let color = '#f59e0b';
             let iconSymbol = '!';
             if (evt.severity === 'CRITICAL') { color = '#dc2626'; iconSymbol = '🚨'; }
@@ -231,7 +241,7 @@ export const GisMap = () => {
             return (
               <Marker
                 key={evt.id}
-                position={[evt.latitude, evt.longitude]}
+                position={[lat, lng]}
                 icon={createCustomIcon(color, iconSymbol)}
                 eventHandlers={{
                   click: () => setSelectedEvent(evt)
@@ -243,11 +253,14 @@ export const GisMap = () => {
                     <div>Location: {evt.location}</div>
                     <div>Confidence: {(evt.confidence * 100).toFixed(1)}%</div>
                     <div>Bus: {evt.busId}</div>
+                    <div className="text-[10px] font-mono font-bold text-blue-700">
+                      {/* {isEdge ? 'SOURCE: EDGE AI' : 'SOURCE: DEMO'} */}
+                    </div>
                     <button 
                       onClick={() => setSelectedEvent(evt)}
-                      className="mt-1 bg-blue-600 text-white px-2 py-0.5 rounded text-[10px] font-bold w-full"
+                      className="mt-1 bg-blue-600 text-white px-2 py-1 rounded text-[10px] font-bold w-full"
                     >
-                      View Evidence & Telemetry →
+                      View Telemetry →
                     </button>
                   </div>
                 </Popup>
@@ -257,8 +270,8 @@ export const GisMap = () => {
         </MapContainer>
 
         {/* MAP LEGEND OVERLAY */}
-        <div className="absolute bottom-3 right-3 bg-slate-950/90 border border-slate-800 rounded p-2 text-xs text-slate-300 z-[1000] space-y-1">
-          <div className="font-bold text-white border-b border-slate-800 pb-1 text-[10px] uppercase tracking-wider font-mono">
+        <div className="absolute bottom-3 right-3 bg-white/95 border border-slate-300 rounded p-2 text-xs text-slate-800 z-[1000] space-y-1 shadow-sm font-medium">
+          <div className="font-bold text-slate-900 border-b border-slate-200 pb-1 text-[10px] uppercase tracking-wider font-mono">
             Map Legend
           </div>
           <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[10px]">
@@ -272,71 +285,73 @@ export const GisMap = () => {
 
         {/* EVENT DETAIL DRAWER MODAL */}
         {selectedEvent && (
-          <div className="absolute top-3 right-3 w-88 bg-slate-900 border border-slate-800 rounded p-4 shadow-xl z-[1000] text-xs text-slate-200 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
-              <div className="flex items-center space-x-1.5">
-                <Zap className="w-3.5 h-3.5 text-amber-400" />
-                <span className="font-mono font-bold text-blue-400">{selectedEvent.id}</span>
+          <div className="absolute top-3 right-3 w-88 bg-white border border-slate-300 rounded-md p-4 shadow-lg z-[1000] text-xs text-slate-800 space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+              <div className="flex items-center space-x-2">
+                <span className="font-mono font-bold text-blue-700">{selectedEvent.id}</span>
+                <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                  SOURCE: EDGE AI
+                </span>
               </div>
               <button 
                 onClick={() => setSelectedEvent(null)}
-                className="text-slate-400 hover:text-white p-0.5"
+                className="text-slate-500 hover:text-slate-900 p-0.5"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="space-y-0.5">
-              <div className="text-sm font-bold text-white">{selectedEvent.type}</div>
-              <div className="text-slate-400 flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-blue-400" /> {selectedEvent.location}
+              <div className="text-sm font-bold text-slate-900">{selectedEvent.type}</div>
+              <div className="text-slate-600 flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 text-blue-600" /> {selectedEvent.location}
               </div>
             </div>
 
             {/* Evidence Image Snapshot */}
-            <div className="relative rounded overflow-hidden border border-slate-800">
+            <div className="relative rounded overflow-hidden border border-slate-200">
               <img 
                 src={selectedEvent.evidenceImage} 
                 alt="Edge AI Evidence Snapshot"
                 className="w-full h-36 object-cover"
               />
-              <div className="absolute bottom-1.5 left-1.5 bg-slate-950/90 px-1.5 py-0.5 rounded text-[9px] text-emerald-400 font-mono font-bold border border-emerald-800">
-                Confidence: {(selectedEvent.confidence * 100).toFixed(1)}%
+              <div className="absolute bottom-1.5 left-1.5 bg-white/95 px-2 py-0.5 rounded text-[9px] text-emerald-700 font-mono font-bold border border-emerald-300">
+                Confidence: {((selectedEvent.confidence || 0.94) * 100).toFixed(1)}%
               </div>
             </div>
 
             {/* Telemetry Breakdown */}
-            <div className="grid grid-cols-2 gap-1.5 bg-slate-950 p-2 rounded border border-slate-800">
+            <div className="grid grid-cols-2 gap-1.5 bg-slate-50 p-2.5 rounded border border-slate-200">
               <div>
-                <span className="text-slate-500 text-[9px]">Sensing Bus ID:</span>
-                <div className="font-bold text-blue-400 font-mono">{selectedEvent.busId}</div>
+                <span className="text-slate-500 text-[9px]">Sensing Bus Unit:</span>
+                <div className="font-bold text-blue-700 font-mono">{selectedEvent.busId}</div>
               </div>
               <div>
                 <span className="text-slate-500 text-[9px]">Severity Level:</span>
                 <div>
-                  <span className={SEVERITY_BADGES[selectedEvent.severity] || "bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded font-mono"}>
+                  <span className={SEVERITY_BADGES[selectedEvent.severity] || "bg-slate-200 text-slate-800 text-[9px] px-1.5 py-0.5 rounded font-mono"}>
                     {selectedEvent.severity}
                   </span>
                 </div>
               </div>
               <div>
                 <span className="text-slate-500 text-[9px]">Coordinates:</span>
-                <div className="font-mono text-slate-300 text-[10px]">{selectedEvent.latitude}, {selectedEvent.longitude}</div>
+                <div className="font-mono text-slate-700 text-[10px]">{selectedEvent.latitude}, {selectedEvent.longitude}</div>
               </div>
               <div>
                 <span className="text-slate-500 text-[9px]">Timestamp:</span>
-                <div className="font-mono text-slate-300 text-[10px]">{selectedEvent.timestamp.split('T')[1] || selectedEvent.timestamp}</div>
+                <div className="font-mono text-slate-700 text-[10px]">{selectedEvent.timestamp ? selectedEvent.timestamp.replace('T', ' ') : 'Just now'}</div>
               </div>
             </div>
 
-            <p className="text-slate-300 leading-relaxed text-[11px] bg-slate-950 p-2 rounded border border-slate-800">
+            <p className="text-slate-700 leading-relaxed text-[11px] bg-slate-50 p-2.5 rounded border border-slate-200">
               {selectedEvent.description}
             </p>
 
             <div className="flex gap-2 pt-1">
               <button 
                 onClick={() => setSelectedEvent(null)}
-                className="flex-1 bg-blue-700 hover:bg-blue-600 text-white font-semibold py-1.5 rounded text-xs transition"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1.5 rounded text-xs transition"
               >
                 Acknowledge Event
               </button>
