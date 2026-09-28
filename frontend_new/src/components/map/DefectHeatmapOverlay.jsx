@@ -1,14 +1,14 @@
-// DefectHeatmapOverlay.jsx - Road Defect & Pothole Density Heatmap + Defect Markers
+// DefectHeatmapOverlay.jsx - Event Density Heatmap + Event Markers for Real Backend Data
 import React, { useEffect, useRef } from 'react';
 import { useMap, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { useApp } from '../../context/AppContext';
-import { SeverityBadge } from '../common/Badge';
-import { AlertCircle, Wrench, Eye } from 'lucide-react';
+import { SeverityBadge, StatusBadge, CategoryBadge } from '../common/Badge';
+import { Eye } from 'lucide-react';
 
-const createDefectMarkerIcon = (type, severity) => {
-  let bgColor = '#ea580c'; // Default orange
-  let emoji = '🕳️';
+const createDefectMarkerIcon = (type, severity, category) => {
+  let bgColor = '#2563eb'; // Default blue
+  let emoji = '📍';
 
   if (severity === 'CRITICAL') {
     bgColor = '#dc2626';
@@ -20,11 +20,14 @@ const createDefectMarkerIcon = (type, severity) => {
     bgColor = '#2563eb';
   }
 
-  if (type.toUpperCase().includes('WATER')) emoji = '🌊';
-  else if (type.toUpperCase().includes('CRACK') || type.toUpperCase().includes('DAMAGED')) emoji = '⚠️';
-  else if (type.toUpperCase().includes('POTHOLE')) emoji = '🕳️';
-  else if (type.toUpperCase().includes('LIGHT')) emoji = '💡';
-  else if (type.toUpperCase().includes('GARBAGE')) emoji = '🗑️';
+  const typeUpper = (type || '').toUpperCase();
+  const categoryUpper = (category || '').toUpperCase();
+
+  if (typeUpper.includes('WATERLOGGING')) emoji = '🌊';
+  else if (typeUpper.includes('POTHOLE') || typeUpper.includes('DAMAGED')) emoji = '🕳️';
+  else if (typeUpper.includes('HIT_AND_RUN') || categoryUpper === 'SAFETY') emoji = '🚨';
+  else if (categoryUpper === 'INFRASTRUCTURE') emoji = '🏗️';
+  else if (typeUpper.includes('TRAFFIC') || categoryUpper === 'TRAFFIC') emoji = '🚦';
 
   return L.divIcon({
     className: 'custom-defect-marker',
@@ -38,19 +41,14 @@ export const DefectHeatmapOverlay = ({
   events = [],
   showHeatmap = true,
   showMarkers = true,
-  opacity = 0.75,
-  filterType = 'ALL' // 'ALL', 'POTHOLE', 'WATERLOGGING', 'ROAD_CRACK', etc.
+  opacity = 0.75
 }) => {
   const map = useMap();
   const canvasRef = useRef(null);
   const { setSelectedEvent } = useApp();
 
-  // Filter road/infrastructure defects
-  const defectEvents = events.filter((e) => {
-    const isDefectCategory = e.category === 'ROAD' || e.category === 'INFRASTRUCTURE' || e.type?.includes('POTHOLE');
-    if (!isDefectCategory) return false;
-    if (filterType !== 'ALL' && !e.type.toUpperCase().includes(filterType.toUpperCase())) return false;
-    return Boolean(e.location?.lat && e.location?.lng);
+  const validEvents = events.filter((e) => {
+    return Boolean(e.location && typeof e.location.lat === 'number' && typeof e.location.lng === 'number' && (e.location.lat !== 0 || e.location.lng !== 0));
   });
 
   useEffect(() => {
@@ -93,7 +91,7 @@ export const DefectHeatmapOverlay = ({
       const zoom = map.getZoom();
       const radius = Math.max(35, 50 * Math.pow(1.15, zoom - 12));
 
-      defectEvents.forEach((evt) => {
+      validEvents.forEach((evt) => {
         const { lat, lng } = evt.location;
         if (!bounds.contains([lat, lng])) return;
 
@@ -109,9 +107,9 @@ export const DefectHeatmapOverlay = ({
           grad.addColorStop(0.4, 'rgba(245, 158, 11, 0.5)');
           grad.addColorStop(1, 'rgba(234, 88, 12, 0)');
         } else {
-          grad.addColorStop(0, 'rgba(245, 158, 11, 0.7)');
-          grad.addColorStop(0.4, 'rgba(202, 138, 4, 0.4)');
-          grad.addColorStop(1, 'rgba(245, 158, 11, 0)');
+          grad.addColorStop(0, 'rgba(59, 130, 246, 0.7)');
+          grad.addColorStop(0.4, 'rgba(96, 165, 250, 0.4)');
+          grad.addColorStop(1, 'rgba(59, 130, 246, 0)');
         }
 
         ctx.fillStyle = grad;
@@ -138,29 +136,34 @@ export const DefectHeatmapOverlay = ({
         canvasRef.current = null;
       }
     };
-  }, [map, showHeatmap, opacity, defectEvents]);
+  }, [map, showHeatmap, opacity, validEvents]);
 
   return (
     <>
-      {showMarkers && defectEvents.map((event) => (
+      {showMarkers && validEvents.map((event) => (
         <Marker
           key={event.observationId}
           position={[event.location.lat, event.location.lng]}
-          icon={createDefectMarkerIcon(event.type, event.severity)}
+          icon={createDefectMarkerIcon(event.type, event.severity, event.category)}
           eventHandlers={{
             click: () => setSelectedEvent(event)
           }}
         >
           <Popup>
             <div className="p-1 max-w-xs text-xs space-y-2 font-sans">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-1.5 gap-2">
                 <span className="font-mono text-blue-700 font-bold">{event.observationId}</span>
-                <SeverityBadge severity={event.severity} />
+                <div className="flex items-center space-x-1">
+                  <CategoryBadge category={event.category} />
+                  <SeverityBadge severity={event.severity} />
+                </div>
               </div>
 
               <div>
                 <div className="font-bold text-slate-900 text-sm">{event.type.replace(/_/g, ' ')}</div>
-                <div className="text-slate-600 text-[11px] mt-0.5">{event.location?.address}</div>
+                <div className="text-slate-600 text-[11px] mt-0.5 font-mono">
+                  Sensed by: <strong className="text-slate-800">{event.busId}</strong>
+                </div>
               </div>
 
               {event.evidence?.imageUrl && (
@@ -170,20 +173,22 @@ export const DefectHeatmapOverlay = ({
                     alt={event.type}
                     className="w-full h-full object-cover"
                   />
-                  <span className="absolute bottom-1 right-1 bg-black/70 text-white font-mono text-[9px] px-1.5 py-0.5 rounded">
-                    AI Conf: {Math.round((event.confidence || 0.95) * 100)}%
-                  </span>
+                  {event.confidence !== undefined && (
+                    <span className="absolute bottom-1 right-1 bg-black/70 text-white font-mono text-[9px] px-1.5 py-0.5 rounded">
+                      AI Conf: {Math.round(event.confidence * 100)}%
+                    </span>
+                  )}
                 </div>
               )}
 
               <div className="pt-2 border-t border-slate-100 flex justify-between items-center text-[10px]">
-                <span className="text-slate-500 font-mono">Detected by: {event.busId}</span>
+                <StatusBadge status={event.status} />
                 <button
                   onClick={() => setSelectedEvent(event)}
-                  className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold flex items-center gap-1 transition"
+                  className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold flex items-center gap-1 transition cursor-pointer"
                 >
                   <Eye className="w-3 h-3" />
-                  Inspect Defect
+                  Inspect
                 </button>
               </div>
             </div>

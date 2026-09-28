@@ -1,32 +1,27 @@
-// dashboardApi.js - Summary analytics and system health REST service
+// dashboardApi.js - Summary metrics REST service for Command Center
 
-import { fetchEvents } from './eventsApi';
-import { fetchBuses } from './busesApi';
+import { normalizeEvent } from './normalizers';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
 /**
- * Fetch aggregated summary metrics for Command Center dashboard.
- * Target backend endpoint: GET /api/v1/dashboard/summary
+ * Fetch aggregated summary metrics from GET /api/v1/dashboard/summary
  */
 export async function fetchDashboardSummary() {
-  const [events, buses] = await Promise.all([fetchEvents(), fetchBuses()]);
+  const url = `${API_BASE_URL}/dashboard/summary`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch dashboard summary: ${response.status} ${response.statusText}`);
+  }
 
-  const activeBuses = buses.filter((b) => b.status === 'ACTIVE');
-  const criticalEvents = events.filter((e) => e.severity === 'CRITICAL' && e.status !== 'RESOLVED');
-  const persistentIssues = events.filter((e) => e.handling === 'PERSISTENT' && e.status !== 'RESOLVED');
+  const json = await response.json();
+  const data = json.data || {};
 
   return {
-    metrics: {
-      activeBusesCount: activeBuses.length,
-      totalBusesCount: buses.length,
-      totalEventsCount: events.length,
-      criticalEventsCount: criticalEvents.length,
-      persistentIssuesCount: persistentIssues.length
-    },
-    systemStatus: {
-      backend: { status: 'ONLINE', label: 'Central API (Express)', responseTimeMs: 24 },
-      database: { status: 'ONLINE', label: 'MongoDB Cluster', docCount: events.length },
-      socket: { status: 'CONNECTED', label: 'Socket.IO Engine', latencyMs: 12 },
-      edgeIngestion: { status: 'STREAMING', label: 'Edge AI Stream', throughput: '142 obs/min' }
-    }
+    activeBusCount: data.activeBusCount || 0,
+    totalEventCount: data.totalEventCount || 0,
+    criticalEventCount: data.criticalEventCount || 0,
+    persistentEventCount: data.persistentEventCount || 0,
+    recentEvents: (data.recentEvents || []).map(normalizeEvent)
   };
 }

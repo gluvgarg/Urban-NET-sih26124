@@ -1,13 +1,13 @@
-// Events.jsx - Unified Edge AI Events & Observations Management System
+// Events.jsx - Unified Real Backend Edge AI Events Register
 
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, AlertTriangle, Layers, Eye, CheckCircle } from 'lucide-react';
+import { Search, Eye } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { SeverityBadge, StatusBadge, CategoryBadge, HandlingBadge } from '../components/common/Badge';
 import { EventDetailDrawer } from '../components/events/EventDetailDrawer';
 
 export const Events = () => {
-  const { events, buses, updateEventStatus, setSelectedEvent } = useApp();
+  const { events, buses, setSelectedEvent, loading } = useApp();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
@@ -26,15 +26,22 @@ export const Events = () => {
       if (busFilter !== 'ALL' && e.busId !== busFilter && (!e.detectedBy || !e.detectedBy.includes(busFilter))) return false;
       if (searchTerm) {
         const query = searchTerm.toLowerCase();
-        const matchId = e.observationId.toLowerCase().includes(query);
-        const matchType = e.type.toLowerCase().includes(query);
-        const matchAddress = e.location?.address?.toLowerCase().includes(query) || false;
-        const matchBus = e.busId.toLowerCase().includes(query);
-        if (!matchId && !matchType && !matchAddress && !matchBus) return false;
+        const matchId = e.observationId?.toLowerCase().includes(query);
+        const matchType = e.type?.toLowerCase().includes(query);
+        const matchBus = e.busId?.toLowerCase().includes(query);
+        if (!matchId && !matchType && !matchBus) return false;
       }
       return true;
     });
   }, [events, categoryFilter, severityFilter, statusFilter, handlingFilter, busFilter, searchTerm]);
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-md border border-slate-200 p-12 text-center text-xs text-slate-500 font-mono">
+        Fetching Edge AI Observations...
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -43,10 +50,10 @@ export const Events = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
           <div>
             <h1 className="text-base font-bold text-slate-900 tracking-tight">Unified Edge AI Events Register</h1>
-            <p className="text-xs text-slate-500">Central database of observations captured by bus fleet edge AI units</p>
+            <p className="text-xs text-slate-500">Central observations repository ingested from transit bus Edge AI units</p>
           </div>
           <div className="text-xs font-mono text-slate-600 bg-slate-100 px-3 py-1.5 rounded border border-slate-200">
-            Total Records: <strong className="text-slate-900">{filteredEvents.length}</strong> / {events.length}
+            Records: <strong className="text-slate-900">{filteredEvents.length}</strong> / {events.length}
           </div>
         </div>
 
@@ -58,7 +65,7 @@ export const Events = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search ID, type, bus or location..."
+                placeholder="Search ID, type or bus..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-300 rounded pl-8 pr-3 py-1.5 text-xs font-medium focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-600"
@@ -99,7 +106,7 @@ export const Events = () => {
             </select>
           </div>
 
-          {/* Status Filter */}
+          {/* Workflow Status Filter */}
           <div>
             <label className="block text-[11px] font-semibold text-slate-600 mb-1 uppercase">Workflow Status</label>
             <select
@@ -140,13 +147,13 @@ export const Events = () => {
           <table className="w-full text-left text-xs text-slate-700 border-collapse">
             <thead>
               <tr className="bg-slate-900 text-white font-semibold uppercase tracking-wider text-[11px]">
-                <th className="py-3 px-3">Event ID</th>
+                <th className="py-3 px-3">Observation ID</th>
                 <th className="py-3 px-3">Category</th>
                 <th className="py-3 px-3">Type</th>
                 <th className="py-3 px-3">Bus ID</th>
+                <th className="py-3 px-3">Handling</th>
                 <th className="py-3 px-3">Severity</th>
-                <th className="py-3 px-3">Conf.</th>
-                <th className="py-3 px-3">Location</th>
+                <th className="py-3 px-3">Confidence</th>
                 <th className="py-3 px-3">Deduplication</th>
                 <th className="py-3 px-3">Captured At</th>
                 <th className="py-3 px-3">Status</th>
@@ -157,7 +164,7 @@ export const Events = () => {
               {filteredEvents.length === 0 ? (
                 <tr>
                   <td colSpan="11" className="py-8 text-center text-slate-500">
-                    No matching Edge AI observations found. Try relaxing filter criteria.
+                    No matching Edge AI observations found.
                   </td>
                 </tr>
               ) : (
@@ -167,16 +174,16 @@ export const Events = () => {
                     <td className="py-3 px-3">
                       <CategoryBadge category={evt.category} />
                     </td>
-                    <td className="py-3 px-3 font-semibold text-slate-900">{evt.type.replace(/_/g, ' ')}</td>
+                    <td className="py-3 px-3 font-semibold text-slate-900">{evt.type?.replace(/_/g, ' ')}</td>
                     <td className="py-3 px-3 font-mono font-bold text-slate-700">{evt.busId}</td>
+                    <td className="py-3 px-3">
+                      <HandlingBadge handling={evt.handling} />
+                    </td>
                     <td className="py-3 px-3">
                       <SeverityBadge severity={evt.severity} />
                     </td>
                     <td className="py-3 px-3 font-mono text-slate-600">
-                      {((evt.confidence || 0.9) * 100).toFixed(0)}%
-                    </td>
-                    <td className="py-3 px-3 text-slate-600 max-w-xs truncate" title={evt.location?.address}>
-                      {evt.location?.address}
+                      {evt.confidence !== undefined ? `${Math.round(evt.confidence * 100)}%` : 'N/A'}
                     </td>
                     <td className="py-3 px-3 font-mono text-slate-600">
                       <span className="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
@@ -184,7 +191,7 @@ export const Events = () => {
                       </span>
                     </td>
                     <td className="py-3 px-3 font-mono text-slate-500 text-[11px]">
-                      {new Date(evt.capturedAt).toLocaleString()}
+                      {evt.capturedAt ? new Date(evt.capturedAt).toLocaleString() : 'N/A'}
                     </td>
                     <td className="py-3 px-3">
                       <StatusBadge status={evt.status} />
@@ -192,9 +199,9 @@ export const Events = () => {
                     <td className="py-3 px-3 text-right">
                       <button
                         onClick={() => setSelectedEvent(evt)}
-                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded font-semibold text-[11px] transition-colors border border-slate-200 flex items-center inline-flex"
+                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded font-semibold text-[11px] transition-colors border border-slate-200 inline-flex items-center gap-1 cursor-pointer"
                       >
-                        <Eye className="w-3 h-3 mr-1 text-slate-600" /> Inspect
+                        <Eye className="w-3 h-3 text-slate-600" /> Inspect
                       </button>
                     </td>
                   </tr>

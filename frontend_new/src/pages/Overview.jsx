@@ -1,19 +1,27 @@
 // Overview.jsx - Command Center Main Dashboard Page
 
 import React from 'react';
-import { Bus, AlertTriangle, ShieldAlert, Layers, Activity, ArrowRight, CheckCircle2, Server, Database, Radio, Cpu } from 'lucide-react';
+import { Bus, AlertTriangle, ShieldAlert, Layers, Activity, ArrowRight, Server, Database, Radio, Cpu, AlertCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { SeverityBadge, StatusBadge, CategoryBadge } from '../components/common/Badge';
 import { GisMapContainer } from '../components/map/GisMapContainer';
 import { EventDetailDrawer } from '../components/events/EventDetailDrawer';
 
 export const Overview = () => {
-  const { events, buses, summary, setSelectedEvent } = useApp();
+  const { events, buses, summary, setSelectedEvent, serverError, loading } = useApp();
 
-  const activeBusesCount = buses.filter((b) => b.status === 'ACTIVE').length;
+  const activeBusesCount = buses.filter((b) => b.status === 'ONLINE').length;
   const criticalEvents = events.filter((e) => e.severity === 'CRITICAL' && e.status !== 'RESOLVED');
   const persistentIssues = events.filter((e) => e.handling === 'PERSISTENT' && e.status !== 'RESOLVED');
   const recentEvents = events.slice(0, 6);
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-md border border-slate-200 p-12 text-center text-xs text-slate-500 font-mono">
+        Connecting to Central Command Server...
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -34,11 +42,11 @@ export const Overview = () => {
           <div className="flex items-center space-x-2 text-xs font-mono overflow-x-auto py-1">
             <span className="px-2 py-1 bg-slate-800 text-slate-300 rounded border border-slate-700">Bus Camera & GPS</span>
             <ArrowRight className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
-            <span className="px-2 py-1 bg-blue-950 text-blue-300 rounded border border-blue-800">Edge AI Detection</span>
+            <span className="px-2 py-1 bg-blue-950 text-blue-300 rounded border border-blue-800">Edge AI Ingestion</span>
             <ArrowRight className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
             <span className="px-2 py-1 bg-slate-800 text-slate-300 rounded border border-slate-700">Deduplication</span>
             <ArrowRight className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
-            <span className="px-2 py-1 bg-emerald-950 text-emerald-300 rounded border border-emerald-800">Command Center</span>
+            <span className="px-2 py-1 bg-emerald-950 text-emerald-300 rounded border border-emerald-800">Command Station</span>
           </div>
         </div>
       </div>
@@ -48,11 +56,13 @@ export const Overview = () => {
         {/* Metric 1 */}
         <div className="bg-white p-4 rounded-md border border-slate-200 shadow-xs flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Active Sensing Buses</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Online Sensing Buses</span>
             <div className="text-2xl font-bold text-slate-900 mt-1">
               {activeBusesCount} <span className="text-xs font-normal text-slate-500">/ {buses.length}</span>
             </div>
-            <span className="text-[11px] text-emerald-600 font-medium">92% Fleet Operational</span>
+            <span className="text-[11px] text-emerald-600 font-medium">
+              {buses.length > 0 ? `${Math.round((activeBusesCount / buses.length) * 100)}% Fleet Online` : 'No Fleet Data'}
+            </span>
           </div>
           <div className="p-3 bg-blue-50 text-blue-700 rounded-md border border-blue-100">
             <Bus className="w-5 h-5" />
@@ -64,7 +74,7 @@ export const Overview = () => {
           <div>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Events Detected</span>
             <div className="text-2xl font-bold text-slate-900 mt-1">{events.length}</div>
-            <span className="text-[11px] text-slate-500">Edge AI Aggregated</span>
+            <span className="text-[11px] text-slate-500">Real Backend Database</span>
           </div>
           <div className="p-3 bg-slate-100 text-slate-700 rounded-md border border-slate-200">
             <AlertTriangle className="w-5 h-5" />
@@ -76,7 +86,7 @@ export const Overview = () => {
           <div>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Critical Real-Time</span>
             <div className="text-2xl font-bold text-red-600 mt-1">{criticalEvents.length}</div>
-            <span className="text-[11px] text-red-600 font-medium">Immediate Dispatch</span>
+            <span className="text-[11px] text-red-600 font-medium">Active Dispatch</span>
           </div>
           <div className="p-3 bg-red-50 text-red-700 rounded-md border border-red-100">
             <ShieldAlert className="w-5 h-5" />
@@ -96,14 +106,14 @@ export const Overview = () => {
         </div>
       </div>
 
-      {/* Main Map & Live Intelligence Grid */}
+      {/* Main Map & System Status Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* GIS Map Preview (2 cols) */}
         <div className="lg:col-span-2 bg-white rounded-md border border-slate-200 p-4 shadow-xs flex flex-col">
           <div className="flex items-center justify-between mb-3">
             <div>
               <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Live GIS Urban Sensing Map</h2>
-              <p className="text-xs text-slate-500">Real-time bus tracking & edge event observation map</p>
+              <p className="text-xs text-slate-500">Real-time bus locations & edge event observations from backend</p>
             </div>
             <span className="text-xs font-mono bg-blue-50 text-blue-700 px-2 py-1 rounded border border-blue-100">
               {buses.length} Buses | {events.length} Events
@@ -114,7 +124,7 @@ export const Overview = () => {
           </div>
         </div>
 
-        {/* System Health & Ingestion Status (1 col) */}
+        {/* System Health Status (1 col) */}
         <div className="space-y-4">
           <div className="bg-white rounded-md border border-slate-200 p-4 shadow-xs">
             <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3">
@@ -129,9 +139,15 @@ export const Overview = () => {
                     <span className="text-[11px] text-slate-500">Express / Node.js Engine</span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-semibold text-[11px]">
-                  ONLINE (24ms)
-                </span>
+                {serverError ? (
+                  <span className="px-2 py-0.5 bg-red-100 text-red-800 rounded font-semibold text-[11px]">
+                    OFFLINE
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-semibold text-[11px]">
+                    ONLINE
+                  </span>
+                )}
               </div>
 
               <div className="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-center justify-between">
@@ -139,38 +155,37 @@ export const Overview = () => {
                   <Database className="w-4 h-4 text-emerald-600" />
                   <div>
                     <span className="font-semibold text-slate-800 block">MongoDB Database</span>
-                    <span className="text-[11px] text-slate-500">Persistent Observations</span>
+                    <span className="text-[11px] text-slate-500">{events.length} Stored Observations</span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-semibold text-[11px]">
-                  CONNECTED
-                </span>
+                {serverError ? (
+                  <span className="px-2 py-0.5 bg-red-100 text-red-800 rounded font-semibold text-[11px]">
+                    UNREACHABLE
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-semibold text-[11px]">
+                    CONNECTED
+                  </span>
+                )}
               </div>
 
               <div className="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Radio className="w-4 h-4 text-purple-600" />
                   <div>
-                    <span className="font-semibold text-slate-800 block">Socket.IO Server</span>
+                    <span className="font-semibold text-slate-800 block">Socket.IO Stream</span>
                     <span className="text-[11px] text-slate-500">Real-time Push Stream</span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-semibold text-[11px]">
-                  LIVE (12ms)
-                </span>
-              </div>
-
-              <div className="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Activity className="w-4 h-4 text-amber-600" />
-                  <div>
-                    <span className="font-semibold text-slate-800 block">Edge Ingestion Stream</span>
-                    <span className="text-[11px] text-slate-500">Mobile Bus Sensing Units</span>
-                  </div>
-                </div>
-                <span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded font-semibold text-[11px]">
-                  142 obs/min
-                </span>
+                {serverError ? (
+                  <span className="px-2 py-0.5 bg-red-100 text-red-800 rounded font-semibold text-[11px]">
+                    DISCONNECTED
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-semibold text-[11px]">
+                    LIVE
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -184,20 +199,23 @@ export const Overview = () => {
               </h3>
             </div>
             <div className="space-y-2">
-              {criticalEvents.slice(0, 3).map((evt) => (
-                <div
-                  key={evt.observationId}
-                  onClick={() => setSelectedEvent(evt)}
-                  className="p-2 bg-white rounded border border-red-200 cursor-pointer hover:bg-red-50/80 transition-colors text-xs"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono font-bold text-red-700">{evt.observationId}</span>
-                    <span className="text-[11px] text-slate-500 font-mono">{evt.busId}</span>
+              {criticalEvents.length === 0 ? (
+                <p className="text-xs text-slate-500 py-2">No active critical alerts.</p>
+              ) : (
+                criticalEvents.slice(0, 3).map((evt) => (
+                  <div
+                    key={evt.observationId}
+                    onClick={() => setSelectedEvent(evt)}
+                    className="p-2 bg-white rounded border border-red-200 cursor-pointer hover:bg-red-50/80 transition-colors text-xs"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono font-bold text-red-700">{evt.observationId}</span>
+                      <span className="text-[11px] text-slate-500 font-mono">{evt.busId}</span>
+                    </div>
+                    <div className="font-bold text-slate-900 mt-0.5">{evt.type.replace(/_/g, ' ')}</div>
                   </div>
-                  <div className="font-bold text-slate-900 mt-0.5">{evt.type.replace(/_/g, ' ')}</div>
-                  <div className="text-[11px] text-slate-600 truncate mt-0.5">{evt.location?.address}</div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -208,7 +226,7 @@ export const Overview = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Recent Edge Observations</h2>
-            <p className="text-xs text-slate-500">Live feed of urban observations captured by bus edge AI</p>
+            <p className="text-xs text-slate-500">Live feed of urban observations captured by bus edge AI from backend</p>
           </div>
         </div>
 
@@ -228,36 +246,44 @@ export const Overview = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium">
-              {recentEvents.map((evt) => (
-                <tr key={evt.observationId} className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-2.5 px-3 font-mono text-blue-700 font-bold">{evt.observationId}</td>
-                  <td className="py-2.5 px-3">
-                    <CategoryBadge category={evt.category} />
-                  </td>
-                  <td className="py-2.5 px-3 font-semibold text-slate-900">{evt.type.replace(/_/g, ' ')}</td>
-                  <td className="py-2.5 px-3 font-mono">{evt.busId}</td>
-                  <td className="py-2.5 px-3">
-                    <SeverityBadge severity={evt.severity} />
-                  </td>
-                  <td className="py-2.5 px-3 font-mono text-slate-600">
-                    {evt.detectionCount || 1} obs
-                  </td>
-                  <td className="py-2.5 px-3 font-mono text-slate-500 text-[11px]">
-                    {new Date(evt.capturedAt).toLocaleTimeString()}
-                  </td>
-                  <td className="py-2.5 px-3">
-                    <StatusBadge status={evt.status} />
-                  </td>
-                  <td className="py-2.5 px-3 text-right">
-                    <button
-                      onClick={() => setSelectedEvent(evt)}
-                      className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded font-semibold text-[11px] transition-colors border border-slate-200"
-                    >
-                      Inspect
-                    </button>
+              {recentEvents.length === 0 ? (
+                <tr>
+                  <td colSpan="9" className="py-8 text-center text-slate-500">
+                    No backend events found.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                recentEvents.map((evt) => (
+                  <tr key={evt.observationId} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-2.5 px-3 font-mono text-blue-700 font-bold">{evt.observationId}</td>
+                    <td className="py-2.5 px-3">
+                      <CategoryBadge category={evt.category} />
+                    </td>
+                    <td className="py-2.5 px-3 font-semibold text-slate-900">{evt.type.replace(/_/g, ' ')}</td>
+                    <td className="py-2.5 px-3 font-mono">{evt.busId}</td>
+                    <td className="py-2.5 px-3">
+                      <SeverityBadge severity={evt.severity} />
+                    </td>
+                    <td className="py-2.5 px-3 font-mono text-slate-600">
+                      {evt.detectionCount || 1} obs
+                    </td>
+                    <td className="py-2.5 px-3 font-mono text-slate-500 text-[11px]">
+                      {new Date(evt.capturedAt).toLocaleTimeString()}
+                    </td>
+                    <td className="py-2.5 px-3">
+                      <StatusBadge status={evt.status} />
+                    </td>
+                    <td className="py-2.5 px-3 text-right">
+                      <button
+                        onClick={() => setSelectedEvent(evt)}
+                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded font-semibold text-[11px] transition-colors border border-slate-200"
+                      >
+                        Inspect
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

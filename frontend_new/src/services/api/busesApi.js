@@ -1,47 +1,56 @@
-// busesApi.js - REST API Client / Mock Service for Urban Net Bus Sensing Fleet
+// busesApi.js - REST API Client for Real Backend Bus Sensing Fleet
 
-import { MOCK_BUSES } from '../../data/mockBuses';
+import { normalizeBus } from './normalizers';
 
-let busesState = [...MOCK_BUSES];
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
 /**
- * Fetch buses matching optional filters.
- * Target backend endpoint: GET /api/v1/buses
+ * Fetch buses matching optional filters from backend GET /api/v1/buses
  */
 export async function fetchBuses(filters = {}) {
-  await new Promise((resolve) => setTimeout(resolve, 60));
-
-  let result = [...busesState];
+  const params = new URLSearchParams();
 
   if (filters.status && filters.status !== 'ALL') {
-    result = result.filter((b) => b.status === filters.status);
+    params.append('status', filters.status);
   }
-  if (filters.edgeStatus && filters.edgeStatus !== 'ALL') {
-    result = result.filter((b) => b.edgeStatus === filters.edgeStatus);
+  if (filters.route && filters.route !== 'ALL') {
+    params.append('route', filters.route);
   }
+
+  const queryString = params.toString();
+  const url = `${API_BASE_URL}/buses${queryString ? `?${queryString}` : ''}`;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch buses: ${response.status} ${response.statusText}`);
+  }
+
+  const json = await response.json();
+  const rawBuses = json.data || [];
+  let buses = rawBuses.map(normalizeBus);
+
   if (filters.search) {
     const query = filters.search.toLowerCase();
-    result = result.filter(
+    buses = buses.filter(
       (b) =>
-        b.busId.toLowerCase().includes(query) ||
-        b.registrationNo.toLowerCase().includes(query) ||
-        b.routeName.toLowerCase().includes(query) ||
-        b.routeId.toLowerCase().includes(query)
+        b.busId?.toLowerCase().includes(query) ||
+        b.route?.toLowerCase().includes(query)
     );
   }
 
-  return result;
+  return buses;
 }
 
 /**
- * Fetch single bus by ID.
- * Target backend endpoint: GET /api/v1/buses/:id
+ * Fetch single bus by ID from backend GET /api/v1/buses/:busId
  */
-export async function fetchBusById(id) {
-  await new Promise((resolve) => setTimeout(resolve, 40));
-  const bus = busesState.find((b) => b.busId === id);
-  if (!bus) {
-    throw new Error(`Bus with ID ${id} not found`);
+export async function fetchBusById(busId) {
+  const url = `${API_BASE_URL}/buses/${encodeURIComponent(busId)}`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch bus ${busId}: ${response.status} ${response.statusText}`);
   }
-  return { ...bus };
+
+  const json = await response.json();
+  return normalizeBus(json.data);
 }

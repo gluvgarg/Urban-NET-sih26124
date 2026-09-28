@@ -68,6 +68,23 @@ export const StatusBadge = ({ status }) => {
   }
 };
 
+export const BusStatusBadge = ({ status }) => {
+  if (status === 'ONLINE') {
+    return (
+      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+        <span className="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-600"></span>
+        ONLINE
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+      <span className="w-1.5 h-1.5 mr-1.5 rounded-full bg-slate-400"></span>
+      OFFLINE
+    </span>
+  );
+};
+
 export const CategoryBadge = ({ category }) => {
   switch (category) {
     case 'ROAD':
