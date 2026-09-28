@@ -1,7 +1,7 @@
 // Overview.jsx - Command Center Main Dashboard Page
 
 import React from 'react';
-import { Bus, AlertTriangle, ShieldAlert, Layers, Activity, ArrowRight, Server, Database, Radio, Cpu, AlertCircle } from 'lucide-react';
+import { Bus, AlertTriangle, ShieldAlert, Layers, ArrowRight, Server, Database, Radio, Cpu } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { SeverityBadge, StatusBadge, CategoryBadge } from '../components/common/Badge';
 import { GisMapContainer } from '../components/map/GisMapContainer';
@@ -10,10 +10,15 @@ import { EventDetailDrawer } from '../components/events/EventDetailDrawer';
 export const Overview = () => {
   const { events, buses, summary, setSelectedEvent, serverError, loading } = useApp();
 
-  const activeBusesCount = buses.filter((b) => b.status === 'ONLINE').length;
-  const criticalEvents = events.filter((e) => e.severity === 'CRITICAL' && e.status !== 'RESOLVED');
-  const persistentIssues = events.filter((e) => e.handling === 'PERSISTENT' && e.status !== 'RESOLVED');
+  // Loaded arrays for map / recent events table / callout list
+  const criticalEventsList = events.filter((e) => e.severity === 'CRITICAL' && e.status !== 'RESOLVED');
   const recentEvents = events.slice(0, 6);
+
+  // Real values from GET /api/v1/dashboard/summary
+  const activeBusCount = summary?.activeBusCount ?? 0;
+  const totalEventCount = summary?.totalEventCount ?? 0;
+  const criticalEventCount = summary?.criticalEventCount ?? 0;
+  const persistentEventCount = summary?.persistentEventCount ?? 0;
 
   if (loading) {
     return (
@@ -51,18 +56,14 @@ export const Overview = () => {
         </div>
       </div>
 
-      {/* KPI Metrics Row */}
+      {/* KPI Metrics Row - Uses GET /api/v1/dashboard/summary totals */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1 */}
         <div className="bg-white p-4 rounded-md border border-slate-200 shadow-xs flex items-center justify-between">
           <div>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Online Sensing Buses</span>
-            <div className="text-2xl font-bold text-slate-900 mt-1">
-              {activeBusesCount} <span className="text-xs font-normal text-slate-500">/ {buses.length}</span>
-            </div>
-            <span className="text-[11px] text-emerald-600 font-medium">
-              {buses.length > 0 ? `${Math.round((activeBusesCount / buses.length) * 100)}% Fleet Online` : 'No Fleet Data'}
-            </span>
+            <div className="text-2xl font-bold text-slate-900 mt-1">{activeBusCount}</div>
+            <span className="text-[11px] text-emerald-600 font-medium">Backend Active Count</span>
           </div>
           <div className="p-3 bg-blue-50 text-blue-700 rounded-md border border-blue-100">
             <Bus className="w-5 h-5" />
@@ -73,8 +74,8 @@ export const Overview = () => {
         <div className="bg-white p-4 rounded-md border border-slate-200 shadow-xs flex items-center justify-between">
           <div>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Events Detected</span>
-            <div className="text-2xl font-bold text-slate-900 mt-1">{events.length}</div>
-            <span className="text-[11px] text-slate-500">Real Backend Database</span>
+            <div className="text-2xl font-bold text-slate-900 mt-1">{totalEventCount}</div>
+            <span className="text-[11px] text-slate-500">MongoDB Total Count</span>
           </div>
           <div className="p-3 bg-slate-100 text-slate-700 rounded-md border border-slate-200">
             <AlertTriangle className="w-5 h-5" />
@@ -85,8 +86,8 @@ export const Overview = () => {
         <div className="bg-white p-4 rounded-md border border-slate-200 shadow-xs flex items-center justify-between">
           <div>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Critical Real-Time</span>
-            <div className="text-2xl font-bold text-red-600 mt-1">{criticalEvents.length}</div>
-            <span className="text-[11px] text-red-600 font-medium">Active Dispatch</span>
+            <div className="text-2xl font-bold text-red-600 mt-1">{criticalEventCount}</div>
+            <span className="text-[11px] text-red-600 font-medium">Backend Critical Count</span>
           </div>
           <div className="p-3 bg-red-50 text-red-700 rounded-md border border-red-100">
             <ShieldAlert className="w-5 h-5" />
@@ -97,8 +98,8 @@ export const Overview = () => {
         <div className="bg-white p-4 rounded-md border border-slate-200 shadow-xs flex items-center justify-between">
           <div>
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Persistent Issues</span>
-            <div className="text-2xl font-bold text-slate-900 mt-1">{persistentIssues.length}</div>
-            <span className="text-[11px] text-slate-500">Deduplicated Infra</span>
+            <div className="text-2xl font-bold text-slate-900 mt-1">{persistentEventCount}</div>
+            <span className="text-[11px] text-slate-500">Backend Persistent Count</span>
           </div>
           <div className="p-3 bg-purple-50 text-purple-700 rounded-md border border-purple-100">
             <Layers className="w-5 h-5" />
@@ -116,7 +117,7 @@ export const Overview = () => {
               <p className="text-xs text-slate-500">Real-time bus locations & edge event observations from backend</p>
             </div>
             <span className="text-xs font-mono bg-blue-50 text-blue-700 px-2 py-1 rounded border border-blue-100">
-              {buses.length} Buses | {events.length} Events
+              {buses.length} Buses | {events.length} Events Loaded
             </span>
           </div>
           <div className="flex-1 min-h-[380px]">
@@ -155,7 +156,7 @@ export const Overview = () => {
                   <Database className="w-4 h-4 text-emerald-600" />
                   <div>
                     <span className="font-semibold text-slate-800 block">MongoDB Database</span>
-                    <span className="text-[11px] text-slate-500">{events.length} Stored Observations</span>
+                    <span className="text-[11px] text-slate-500">{totalEventCount} Stored Observations</span>
                   </div>
                 </div>
                 {serverError ? (
@@ -195,14 +196,14 @@ export const Overview = () => {
             <div className="flex items-center space-x-2 mb-2">
               <ShieldAlert className="w-4 h-4 text-red-600" />
               <h3 className="text-xs font-bold text-red-900 uppercase tracking-wider">
-                Critical Real-Time Alerts ({criticalEvents.length})
+                Critical Real-Time Alerts ({criticalEventCount})
               </h3>
             </div>
             <div className="space-y-2">
-              {criticalEvents.length === 0 ? (
-                <p className="text-xs text-slate-500 py-2">No active critical alerts.</p>
+              {criticalEventsList.length === 0 ? (
+                <p className="text-xs text-slate-500 py-2">No active critical alerts loaded.</p>
               ) : (
-                criticalEvents.slice(0, 3).map((evt) => (
+                criticalEventsList.slice(0, 3).map((evt) => (
                   <div
                     key={evt.observationId}
                     onClick={() => setSelectedEvent(evt)}
@@ -212,7 +213,7 @@ export const Overview = () => {
                       <span className="font-mono font-bold text-red-700">{evt.observationId}</span>
                       <span className="text-[11px] text-slate-500 font-mono">{evt.busId}</span>
                     </div>
-                    <div className="font-bold text-slate-900 mt-0.5">{evt.type.replace(/_/g, ' ')}</div>
+                    <div className="font-bold text-slate-900 mt-0.5">{evt.type?.replace(/_/g, ' ')}</div>
                   </div>
                 ))
               )}
@@ -259,7 +260,7 @@ export const Overview = () => {
                     <td className="py-2.5 px-3">
                       <CategoryBadge category={evt.category} />
                     </td>
-                    <td className="py-2.5 px-3 font-semibold text-slate-900">{evt.type.replace(/_/g, ' ')}</td>
+                    <td className="py-2.5 px-3 font-semibold text-slate-900">{evt.type?.replace(/_/g, ' ')}</td>
                     <td className="py-2.5 px-3 font-mono">{evt.busId}</td>
                     <td className="py-2.5 px-3">
                       <SeverityBadge severity={evt.severity} />
@@ -268,7 +269,7 @@ export const Overview = () => {
                       {evt.detectionCount || 1} obs
                     </td>
                     <td className="py-2.5 px-3 font-mono text-slate-500 text-[11px]">
-                      {new Date(evt.capturedAt).toLocaleTimeString()}
+                      {evt.capturedAt ? new Date(evt.capturedAt).toLocaleTimeString() : 'N/A'}
                     </td>
                     <td className="py-2.5 px-3">
                       <StatusBadge status={evt.status} />
@@ -276,7 +277,7 @@ export const Overview = () => {
                     <td className="py-2.5 px-3 text-right">
                       <button
                         onClick={() => setSelectedEvent(evt)}
-                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded font-semibold text-[11px] transition-colors border border-slate-200"
+                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded font-semibold text-[11px] transition-colors border border-slate-200 cursor-pointer"
                       >
                         Inspect
                       </button>

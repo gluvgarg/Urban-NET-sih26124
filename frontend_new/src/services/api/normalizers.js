@@ -43,14 +43,12 @@ export function normalizeEvent(event) {
 
 export function normalizeBus(bus) {
   if (!bus) return null;
-  const normLocation = normalizeLocation(bus.location);
   return {
     ...bus,
     busId: bus.busId || bus._id,
     route: bus.route || '',
     status: bus.status === 'ONLINE' ? 'ONLINE' : 'OFFLINE',
-    location: normLocation,
-    lastLocation: normLocation, // Backward compatibility for map markers
+    location: normalizeLocation(bus.location),
     speed: typeof bus.speed === 'number' ? bus.speed : 0,
     lastSeenAt: bus.lastSeenAt || new Date().toISOString()
   };
