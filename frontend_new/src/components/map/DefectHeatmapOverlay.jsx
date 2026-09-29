@@ -166,6 +166,14 @@ export const DefectHeatmapOverlay = ({
                 </div>
               </div>
 
+              {event.type === 'HIT_AND_RUN' && event.vehicleNumber && (
+                <div className="text-[11px] text-slate-600">
+                  Vehicle No.: <strong className="text-red-700 font-mono">
+                    {event.vehicleNumber}
+                  </strong>
+                </div>
+              )}
+
               {event.evidence?.imageUrl && (
                 <div className="rounded overflow-hidden border border-slate-200 h-24 w-full relative">
                   <img

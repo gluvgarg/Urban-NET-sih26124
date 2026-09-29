@@ -24,6 +24,7 @@ const validateEdgeEventPayload = (payload) => {
     location,
     capturedAt,
     evidence,
+    vehicleNumber,
     model,
     speed
   } = payload;
@@ -122,6 +123,10 @@ const validateEdgeEventPayload = (payload) => {
     evidence: {
       imageUrl: evidence && evidence.imageUrl ? String(evidence.imageUrl).trim() : ''
     },
+    vehicleNumber:
+    vehicleNumber !== undefined && vehicleNumber !== null
+        ? String(vehicleNumber).trim().toUpperCase()
+        : '',
     model: {
       name: model && model.name ? String(model.name).trim() : '',
       version: model && model.version ? String(model.version).trim() : ''

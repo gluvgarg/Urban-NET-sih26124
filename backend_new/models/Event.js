@@ -64,6 +64,11 @@ const eventSchema = new mongoose.Schema({
       default: ''
     }
   },
+  vehicleNumber: {
+    type: String,
+    default: '',
+    trim: true
+  },
   model: {
     name: {
       type: String,

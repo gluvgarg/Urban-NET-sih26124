@@ -126,6 +126,14 @@ export const EventDetailDrawer = () => {
                   {event.busId}
                 </span>
               </div>
+              {event.type === 'HIT_AND_RUN' && event.vehicleNumber && (
+                <div className="p-3 flex justify-between items-center">
+                  <span className="text-slate-500">Vehicle Number</span>
+                  <span className="font-mono font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-100">
+                    {event.vehicleNumber}
+                  </span>
+                </div>
+              )}
               <div className="p-3 flex justify-between items-center">
                 <span className="text-slate-500 flex items-center">
                   <Layers className="w-3.5 h-3.5 mr-1.5 text-slate-400" /> Total Observations
