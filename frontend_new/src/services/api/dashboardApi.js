@@ -2,7 +2,10 @@
 
 import { normalizeEvent } from './normalizers';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  'https://urban-net-sih26124-backend.onrender.com/api/v1';
 
 /**
  * Fetch aggregated summary metrics from GET /api/v1/dashboard/summary

@@ -9,8 +9,12 @@ let socket = null;
  * Initialize real-time Socket.IO connection
  */
 export function initSocket({ onNewEvent, onUpdatedEvent, onUpdatedBus }) {
-  const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+  // const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
 
+  const socketUrl =
+    import.meta.env.VITE_SOCKET_URL ||
+    'https://urban-net-sih26124-backend.onrender.com';
+    
   if (socket) {
     socket.disconnect();
     socket = null;
